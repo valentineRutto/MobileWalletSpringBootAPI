@@ -2,6 +2,7 @@ package com.comulynx.wallet.rest.api.controller;
 
 import java.util.List;
 
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class AccountController {
 	public ResponseEntity<?> getAccountBalanceByCustomerIdAndAccountNo(@RequestBody String request)
 			throws ResourceNotFoundException {
 		try {
+
 			JsonObject response = new JsonObject();
 
 			final JsonObject balanceRequest = gson.fromJson(request, JsonObject.class);
@@ -49,16 +51,23 @@ public class AccountController {
 
 
 			// TODO : Add logic to find Account balance by CustomerId
-			Account account = null;
+			Account account = accountRepository.findAccountByCustomerId(customerId).orElseThrow(() -> new ResourceNotFoundException(
+                    "Account not found for customerId: " + customerId ));
 
 			response.addProperty("balance", account.getBalance());
 			response.addProperty("accountNo", account.getAccountNo());
 			return ResponseEntity.ok().body(gson.toJson(response));
-		} catch (Exception ex) {
-			logger.info("Exception {}", AppUtilities.getExceptionStacktrace(ex));
+		}catch (ResourceNotFoundException ex) {
+            logger.error("Account not found: {}", ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
 
-			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 
-		}
+        } catch (Exception ex) {
+            logger.error("Exception {}", AppUtilities.getExceptionStacktrace(ex));
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 	}
 }
+
+
