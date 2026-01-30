@@ -13,6 +13,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,6 +50,9 @@ public class CustomerController {
 	}
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 	/**
 	 * Fix Customer Login functionality
@@ -98,7 +102,7 @@ public class CustomerController {
             obj.addProperty("accountNo", account.getAccountNo());
             obj.addProperty("balance", account.getBalance());
 
-response.add("customerAccount", obj);
+            response.add("customerAccount", obj);
 
             return ResponseEntity.ok().body(gson.toJson(response));
 
@@ -147,12 +151,16 @@ response.add("customerAccount", obj);
                 throw new CustomerAlreadyExistsException("Customer with customerId " + customerId + " already exists");
             }
 
+            String password = passwordEncoder.encode(customerPIN);
+            customer.setPin(password);
+
 
 
 			String accountNo = generateAccountNo(customer.getCustomerId());
 			Account account = new Account();
 			account.setCustomerId(customer.getCustomerId());
 			account.setAccountNo(accountNo);
+
 			account.setBalance(0.0);
 			accountRepository.save(account);
 
