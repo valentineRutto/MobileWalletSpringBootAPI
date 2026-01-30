@@ -143,9 +143,6 @@ public class CustomerController {
 			// customerId exists. If exists, throw a Customer with [?] exists
 			// Exception.
 
-            if (customerRepository.existsByCustomerEmail(email)) {
-                throw new CustomerAlreadyExistsException("Customer with email " + email + " already exists");
-            }
 
             if (customerRepository.existsByCustomerId(customerId)) {
                 throw new CustomerAlreadyExistsException("Customer with customerId " + customerId + " already exists");
@@ -153,8 +150,6 @@ public class CustomerController {
 
             String password = passwordEncoder.encode(customerPIN);
             customer.setPin(password);
-
-
 
 			String accountNo = generateAccountNo(customer.getCustomerId());
 			Account account = new Account();

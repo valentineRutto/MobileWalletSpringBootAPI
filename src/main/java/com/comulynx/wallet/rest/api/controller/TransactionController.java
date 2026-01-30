@@ -1,11 +1,14 @@
 package com.comulynx.wallet.rest.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -146,8 +149,10 @@ public class TransactionController {
 			String accountNo = balanceRequest.get("accountNo").getAsString();
 
 			// FIXME: Should return last 5 transactions from the database
-			List<Transaction> miniStatement = transactionRepository
-					.getMiniStatementUsingCustomerIdAndAccountNo(customerId, accountNo);
+            Pageable topFive = PageRequest.of(0, 5);
+
+           Optional< List<Transaction>> miniStatement = transactionRepository
+					.getMiniStatementUsingCustomerIdAndAccountNo(customerId, accountNo, topFive);
 
 			return ResponseEntity.ok().body(gson.toJson(miniStatement));
 		} catch (Exception ex) {
