@@ -26,5 +26,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 	// TODO : Change below function to return Optional<List<Transaction>>
 	@Query("SELECT t FROM Transaction t WHERE t.customerId = :customerId AND  t.accountNo = :accountNo")
 	Optional<List<Transaction>> getMiniStatementUsingCustomerIdAndAccountNo(@Param("customerId") String customer_id, @Param("accountNo")String account_no, Pageable pageable);
+    @Query("SELECT t FROM Transaction t WHERE t.customerId = :customerId ")
+    List<Transaction> findTop100ByCustomerIdOrderByTransactionDateDesc(@Param("customerId") String customerId, Pageable pageable);
 
 }

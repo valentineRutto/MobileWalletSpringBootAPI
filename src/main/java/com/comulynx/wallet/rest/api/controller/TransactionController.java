@@ -61,9 +61,12 @@ public class TransactionController {
 			String customerId = req.get("customerId").getAsString();
 
 			// TODO : Add login here to get Last 100 Transactions By CustomerId
-			List<Transaction> last100Transactions = null;
+            Pageable topFive = PageRequest.of(0, 100);
 
-			return ResponseEntity.ok().body(gson.toJson(last100Transactions));
+            List<Transaction> last100Transactions = transactionRepository
+                    .findTop100ByCustomerIdOrderByTransactionDateDesc(customerId, topFive);
+
+            return ResponseEntity.ok().body(gson.toJson(last100Transactions));
 		} catch (Exception ex) {
 			logger.info("Exception {}", AppUtilities.getExceptionStacktrace(ex));
 
