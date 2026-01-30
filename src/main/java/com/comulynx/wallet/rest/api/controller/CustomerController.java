@@ -1,8 +1,11 @@
 package com.comulynx.wallet.rest.api.controller;
 
+import java.math.BigInteger;
 import java.util.List;
 
+import com.comulynx.wallet.rest.api.exception.CustomerAlreadyExistsException;
 import com.comulynx.wallet.rest.api.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 
 
@@ -44,6 +47,8 @@ public class CustomerController {
 	public List<Customer> getAllCustomers() {
 		return customerRepository.findAll();
 	}
+    @Autowired
+    private EntityManager entityManager;
 
 	/**
 	 * Fix Customer Login functionality
@@ -126,11 +131,23 @@ response.add("customerAccount", obj);
 		try {
 			String customerPIN = customer.getPin();
 			String email = customer.getEmail();
-			
-			// TODO : Add logic to Hash Customer PIN here
+            String customerId = customer.getCustomerId();
+
+
+            // TODO : Add logic to Hash Customer PIN here
 			//  : Add logic to check if Customer with provided email, or
 			// customerId exists. If exists, throw a Customer with [?] exists
 			// Exception.
+
+            if (customerRepository.existsByCustomerEmail(email)) {
+                throw new CustomerAlreadyExistsException("Customer with email " + email + " already exists");
+            }
+
+            if (customerRepository.existsByCustomerId(customerId)) {
+                throw new CustomerAlreadyExistsException("Customer with customerId " + customerId + " already exists");
+            }
+
+
 
 			String accountNo = generateAccountNo(customer.getCustomerId());
 			Account account = new Account();
@@ -158,6 +175,11 @@ response.add("customerAccount", obj);
 	private String generateAccountNo(String customerId) {
 		// TODO : Add logic here - generate a random but unique Account No (NB:
 		// Account No should be unique in the accounts table)
-		return "";
+
+        BigInteger nextVal = (BigInteger) entityManager
+                .createNativeQuery("SELECT NEXT VALUE FOR account_no_seq")
+                .getSingleResult();
+
+        return "ACT" + nextVal;
 	}
 }

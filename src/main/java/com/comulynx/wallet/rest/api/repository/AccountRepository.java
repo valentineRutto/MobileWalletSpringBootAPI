@@ -18,7 +18,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 	Optional<Account> findAccountByCustomerIdOrAccountNo(String customerId, String accountNo);
 	
 	Optional<Account> findAccountByCustomerIdAndAccountNo(String customerId, String accountNo);
-	
-	
+
+    boolean existsByAccountNo(String accountNo);
+
 
 }
