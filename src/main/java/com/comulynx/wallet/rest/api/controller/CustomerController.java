@@ -2,9 +2,11 @@ package com.comulynx.wallet.rest.api.controller;
 
 import java.util.List;
 
+import com.comulynx.wallet.rest.api.exception.ResourceNotFoundException;
 import jakarta.validation.Valid;
 
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,15 +69,48 @@ public class CustomerController {
 			// If password do not match throw an error "Invalid credentials"
 			
 			//TODO : Return a JSON object with the following after successful login
-			//Customer Name, Customer ID, email and Customer Account 
+			//Customer Name, Customer ID, email and Customer Account
 
-			return ResponseEntity.status(200).body(HttpStatus.OK);
+            Customer customer = customerRepository.findByCustomerId(customerId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Customer does not exist"));
 
-		} catch (Exception ex) {
-			logger.info("Exception {}", AppUtilities.getExceptionStacktrace(ex));
-			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            if (!customer.getPin().equals(customerPIN)) {
+                logger.warn("Invalid credentials for customerId: {}", customerId);
+                throw new BadRequestException("Invalid credentials");
+            }
+
+            logger.info("Login successful for customerId: {}", customerId);
+
+            Account account = accountRepository
+                    .findAccountByCustomerId(customerId)
+                    .orElseThrow(() -> new RuntimeException("Account not found"));
+
+            response.addProperty("customerName", customer.getFirstName() + " " + customer.getLastName());
+            response.addProperty("customerId", customer.getCustomerId());
+            response.addProperty("email", customer.getEmail());
+
+            JsonObject obj = new JsonObject();
+            obj.addProperty("accountNo", account.getAccountNo());
+            obj.addProperty("balance", account.getBalance());
+
+response.add("customerAccount", obj);
+
+            return ResponseEntity.ok().body(gson.toJson(response));
 
 		}
+        catch (ResourceNotFoundException ex) {
+            logger.error("Customer not found: {}", ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+
+        } catch (BadRequestException ex) {
+            logger.error("Invalid credentials: {}", ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+
+        } catch (Exception ex) {
+            logger.error("Exception {}", AppUtilities.getExceptionStacktrace(ex));
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 	}
 
 	/**
