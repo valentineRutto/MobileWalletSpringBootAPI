@@ -48,8 +48,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!--		 FIXME: Add Spring Boot DevTools dependency-->
-        <!--		 FIXME: Add H2 in-memory database dependency-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

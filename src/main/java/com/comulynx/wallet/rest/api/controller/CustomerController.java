@@ -71,13 +71,11 @@ public class CustomerController {
 			String customerId = req.get("customerId").getAsString();
 			String customerPIN = req.get("pin").getAsString();
 
-			// TODO : Add Customer login logic here. Login using customerId and
 			// PIN
 			// NB: We are using plain text password for testing Customer login
 			// If customerId doesn't exists throw an error "Customer does not exist"
 			// If password do not match throw an error "Invalid credentials"
 			
-			//TODO : Return a JSON object with the following after successful login
 			//Customer Name, Customer ID, email and Customer Account
 
             Customer customer = customerRepository.findByCustomerId(customerId)
@@ -138,7 +136,6 @@ public class CustomerController {
             String customerId = customer.getCustomerId();
 
 
-            // TODO : Add logic to Hash Customer PIN here
 			//  : Add logic to check if Customer with provided email, or
 			// customerId exists. If exists, throw a Customer with [?] exists
 			// Exception.
@@ -176,7 +173,6 @@ public class CustomerController {
 	 * 
 	 */
 	private String generateAccountNo(String customerId) {
-		// TODO : Add logic here - generate a random but unique Account No (NB:
 		// Account No should be unique in the accounts table)
 
         BigInteger nextVal = (BigInteger) entityManager

@@ -60,7 +60,6 @@ public class TransactionController {
 			final JsonObject req = gson.fromJson(request, JsonObject.class);
 			String customerId = req.get("customerId").getAsString();
 
-			// TODO : Add login here to get Last 100 Transactions By CustomerId
             Pageable topFive = PageRequest.of(0, 100);
 
             List<Transaction> last100Transactions = transactionRepository
@@ -151,7 +150,6 @@ public class TransactionController {
 			String customerId = balanceRequest.get("customerId").getAsString();
 			String accountNo = balanceRequest.get("accountNo").getAsString();
 
-			// FIXME: Should return last 5 transactions from the database
             Pageable topFive = PageRequest.of(0, 5);
 
            Optional< List<Transaction>> miniStatement = transactionRepository

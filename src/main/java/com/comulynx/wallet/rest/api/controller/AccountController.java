@@ -50,7 +50,6 @@ public class AccountController {
 			String customerId = balanceRequest.get("customerId").getAsString();
 
 
-			// TODO : Add logic to find Account balance by CustomerId
 			Account account = accountRepository.findAccountByCustomerId(customerId).orElseThrow(() -> new ResourceNotFoundException(
                     "Account not found for customerId: " + customerId ));
 
